@@ -29,8 +29,6 @@ void read_header(Elf64_Ehdr* header, FILE* file) {
     if (!r) {
       printf("Erreur de lecture\n");
     }
-  } else {
-    printf("Le fichier spécifié est introuvable\n");
   }
   // pour éviter l'erreur de compilation
   r = r + 0;
@@ -48,8 +46,6 @@ void read_section_header(Elf64_Ehdr* header, Elf64_Shdr* sections_tab, FILE* fil
     if (!r) {
       printf("Erreur de lecture\n");
     }
-  } else {
-    printf("Le fichier spécifié est introuvable\n");
   }
   // pour éviter l'erreur de compilation
   r = r + 0;
@@ -80,7 +76,6 @@ Elf32_Sym* read_symbol_table(Elf64_Ehdr* header, Elf64_Shdr* sections_tab, int* 
       }
     }
   } else {
-    printf("Le fichier spécifié est introuvable\n");
     // pour éviter l'erreur de compilation
     r = r + 0;
   }
@@ -98,7 +93,6 @@ void read_relocation_table(Elf64_Shdr* sections_tab, Elf32_Rel* relocation_table
     fseek(file, sections_tab->sh_offset + sections_tab->sh_addr + sizeof(Elf32_Rel)*i, SEEK_SET);
     r = fread(relocation_table, sizeof(Elf32_Rel), 1, file);
   } else {
-    printf("Le fichier spécifié est introuvable\n");
     // pour éviter l'erreur de compilation
     r = r + 0;
   }

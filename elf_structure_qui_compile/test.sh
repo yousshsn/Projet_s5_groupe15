@@ -1,6 +1,13 @@
 #!/bin/bash
-echo -e "Usage : test [-OPTION] [NOM_FICHIER]\n\tOPTIONS : -s teste l'affichage de la table des symboles\n"
-if [[ $1 = "-s" ]]; then
+if [[ $# < 2 ]]; then
+  echo "Usage :"
+  echo " ./test.sh -h [FILE_NAME] : teste l'affichage de l'en-tête du fichier elf spécifié"
+  echo " ./test.sh -S [FILE_NAME]: teste l'affichage de la table des sections du fichier elf spécifié"
+  echo " ./test.sh -x [SECTION_NB] [FILE_NAME]: teste l'affichage du contenu de la section n°[SECTION_NB] du fichier elf spécifié"
+  echo " ./test.sh -x [SECTION_NAME] [FILE_NAME]: teste l'affichage du contenu de la section de nom [SECTION_NAME] du fichier elf spécifié"
+  echo " ./test.sh -s [FILE_NAME]: teste l'affichage de la table des symboles du fichier elf spécifié"
+  echo " ./test.sh -r [FILE_NAME]: teste l'affichage des tables de réimplantation du fichier elf spécifié"
+elif [[ $1 = "-s" ]]; then
   if [[ -e test_files/symtab_$2.txt ]]; then
     rm test_files/symtab_$2.txt
   fi

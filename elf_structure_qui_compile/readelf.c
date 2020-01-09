@@ -10,6 +10,7 @@ void print_elf_header(const char* elf_file) {
   read_header(header, file);
   print_header(header);
   free(header);
+  fclose(file);
 }
 
 void print_elf_sections_tab(const char* elf_file) {
@@ -22,6 +23,7 @@ void print_elf_sections_tab(const char* elf_file) {
   print_sections_tab(header, sections_tab, sh_str);
   free(header);
   free(sections_tab);
+  fclose(file);
 }
 
 void print_elf_section_content_from_nb(const char* elf_file, int* section_nb) {
@@ -36,6 +38,7 @@ void print_elf_section_content_from_nb(const char* elf_file, int* section_nb) {
   print_section_content_from_nb(header, sections_tab, sh_str, data, section_nb);
   free(header);
   free(sections_tab);
+  fclose(file);
 }
 
 void print_elf_section_content_from_name(const char* elf_file, const char* section_name) {
@@ -50,6 +53,7 @@ void print_elf_section_content_from_name(const char* elf_file, const char* secti
   print_section_content_from_name(header, sections_tab, sh_str, data, section_name);
   free(header);
   free(sections_tab);
+  fclose(file);
 }
 
 void print_elf_symbols_table(const char* elf_file) {
@@ -64,6 +68,7 @@ void print_elf_symbols_table(const char* elf_file) {
   free(header);
   free(sections_tab);
   free(nb_symbols);
+  fclose(file);
 }
 
 void print_elf_relocation_table(const char* elf_file) {
@@ -83,26 +88,77 @@ void print_elf_relocation_table(const char* elf_file) {
   free(header);
   free(sections_tab);
   free(header_reloc_tab);
+  fclose(file);
+}
+
+int is_elf_file(const char* elf_file) {
+  FILE* file = open_file(elf_file, "rb");
+	Elf64_Ehdr *header = malloc(sizeof(Elf64_Ehdr));
+	read_header(header, file);
+	if (header->e_ident[EI_MAG0]== 0x7f &&
+    header->e_ident[EI_MAG1] == 'E' &&
+    header->e_ident[EI_MAG2] == 'L' &&
+    header->e_ident[EI_MAG3] == 'F') {
+    free(header);
+		fclose(file);
+		return 1;
+	} else {
+    free(header);
+		fclose(file);
+		return 0;
+	}
 }
 
 int main(int argc, char const *argv[]) {
-  if (argc > 2) {
+  if (argc > 2 && argc < 5) {
     if (!strcmp(argv[1], "-h")) {
-      print_elf_header(argv[2]);
+      if (access(argv[2], R_OK) != 0 || !is_elf_file(argv[2])) {
+        printf("Le fichier spécifié n'est pas au format elf ou n'existe pas\n");
+      } else {
+        print_elf_header(argv[2]);
+      }
     } else if (!strcmp(argv[1], "-S")) {
-      print_elf_sections_tab(argv[2]);
+      if (access(argv[2], R_OK) != 0 || !is_elf_file(argv[2])) {
+        printf("Le fichier spécifié n'est pas au format elf ou n'existe pas\n");
+      } else {
+        print_elf_sections_tab(argv[2]);
+      }
     } else if (!strcmp(argv[1], "-x")) {
       int section_nb = atoi(argv[2]);
       if (section_nb != 0) {
-        print_elf_section_content_from_nb(argv[3], &section_nb);
+        if (access(argv[2], R_OK) != 0 || !is_elf_file(argv[2])) {
+          printf("Le fichier spécifié n'est pas au format elf ou n'existe pas\n");
+        } else {
+          print_elf_section_content_from_nb(argv[3], &section_nb);
+        }
       } else {
-        print_elf_section_content_from_name(argv[3], argv[2]);
+        if (access(argv[2], R_OK) != 0 || !is_elf_file(argv[2])) {
+          printf("Le fichier spécifié n'est pas au format elf ou n'existe pas\n");
+        } else {
+          print_elf_section_content_from_name(argv[3], argv[2]);
+        }
       }
     } else if (!strcmp(argv[1], "-s")) {
-      print_elf_symbols_table(argv[2]);
+      if (access(argv[2], R_OK) != 0 || !is_elf_file(argv[2])) {
+        printf("Le fichier spécifié n'est pas au format elf ou n'existe pas\n");
+      } else {
+        print_elf_symbols_table(argv[2]);
+      }
     } else if (!strcmp(argv[1], "-r")) {
-      print_elf_relocation_table(argv[2]);
+      if (access(argv[2], R_OK) != 0 || !is_elf_file(argv[2])) {
+        printf("Le fichier spécifié n'est pas au format elf ou n'existe pas\n");
+      } else {
+        print_elf_relocation_table(argv[2]);
+      }
     }
+  } else {
+    printf("Usage :\n");
+    printf(" ./readelf -h [FILE_NAME] : Affiche l'en-tête du fichier elf spécifié\n");
+		printf(" ./readelf -S [FILE_NAME]: Affiche la table des sections du fichier elf spécifié\n");
+		printf(" ./readelf -x [SECTION_NB] [FILE_NAME]: Affiche le contenu de la section n°[SECTION_NB] du fichier elf spécifié\n");
+		printf(" ./readelf -x [SECTION_NAME] [FILE_NAME]: Affiche le contenu de la section de nom [SECTION_NAME] du fichier elf spécifié\n");
+		printf(" ./readelf -s [FILE_NAME]: Affiche la table des symboles du fichier elf spécifié\n");
+		printf(" ./readelf -r [FILE_NAME]: Affiche les tables de réimplantation du fichier elf spécifié\n");
   }
   return 0;
 }
