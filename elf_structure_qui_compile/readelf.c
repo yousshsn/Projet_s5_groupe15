@@ -126,13 +126,13 @@ int main(int argc, char const *argv[]) {
     } else if (!strcmp(argv[1], "-x")) {
       int section_nb = atoi(argv[2]);
       if (section_nb != 0) {
-        if (access(argv[2], R_OK) != 0 || !is_elf_file(argv[2])) {
+        if (access(argv[3], R_OK) != 0 || !is_elf_file(argv[3])) {
           printf("Le fichier spécifié n'est pas au format elf ou n'existe pas\n");
         } else {
           print_elf_section_content_from_nb(argv[3], &section_nb);
         }
       } else {
-        if (access(argv[2], R_OK) != 0 || !is_elf_file(argv[2])) {
+        if (access(argv[3], R_OK) != 0 || !is_elf_file(argv[3])) {
           printf("Le fichier spécifié n'est pas au format elf ou n'existe pas\n");
         } else {
           print_elf_section_content_from_name(argv[3], argv[2]);
